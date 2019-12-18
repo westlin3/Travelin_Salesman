@@ -17,9 +17,9 @@ public class TravelingSalesman {
 
     static long MINVALUE = -200000000;
 
-    static int numberOfTrials = 30;
-    static int MAXINPUTSIZE  = 1200;
-    static int MININPUTSIZE  =  100;
+    static int numberOfTrials = 50;
+    static int MAXINPUTSIZE  = 11;
+    static int MININPUTSIZE  =  4;
 
     static String ResultsFolderPath = "/home/curtis/Bean/LAB8/"; // pathname to results folder
     static FileWriter resultsFile;
@@ -38,10 +38,10 @@ public class TravelingSalesman {
         ThreadCpuStopWatch BatchStopwatch = new ThreadCpuStopWatch(); // for timing an entire set of trials
         ThreadCpuStopWatch TrialStopwatch = new ThreadCpuStopWatch(); // for timing an individual trial
 
-        resultsWriter.println("#InputSize    AverageTime"); // # marks a comment in gnuplot data
+        resultsWriter.println("#InputSize    Correctness"); // # marks a comment in gnuplot data
         resultsWriter.flush();
 
-        for (int inputSize = MININPUTSIZE; inputSize <= MAXINPUTSIZE; inputSize += 100) {
+        for (int inputSize = MININPUTSIZE; inputSize <= MAXINPUTSIZE; inputSize++) {
             long Fib_value = 1;
             // progress message...
             System.out.println("Running test for input size " + inputSize + " ... ");
@@ -56,21 +56,36 @@ public class TravelingSalesman {
             // and divide by the number of trials -- this reduces the impact of the amount of time it takes to call the
             // stopwatch methods themselves
 
-            double[][] Matrix = GenerateGraphs.GenerateRandomEuclideanCostMatrix(inputSize);
+
             BatchStopwatch.start(); // comment this line if timing trials individually
 
             // list for dynamic recursive function
             long[] fib = new long[93];
             // run the trials
+            double SQR = 0;
             for (long trial = 0; trial < numberOfTrials; trial++) {
-                GreedyAlgorithm(Matrix, inputSize);
+                double[][] Matrix = GenerateGraphs.GenerateRandomEuclideanCostMatrix(inputSize);
+                int tour1[] = GreedyAlgorithm(Matrix, inputSize);
+                int tour2[] = BruteForce(Matrix, inputSize);
+                double h = CalculateTourLength(Matrix, tour1);
+                double r = CalculateTourLength(Matrix, tour2);
+                if (h/r < 1) {
+                    PrintArray(tour1);
+                    System.out.println(h);
+                    PrintArray(tour2);
+                    System.out.println(r);
+                    PrintMatrix(Matrix, inputSize);
+                }
+
+                SQR += h/r;
+//                System.out.println(SQR);
             }
 
             batchElapsedTime = BatchStopwatch.elapsedTime(); // *** comment this line if timing trials individually
-            double averageTimePerTrialInBatch = (double) batchElapsedTime / (double) numberOfTrials; // calculate the average time per trial in this batch
-
+//            double averageTimePerTrialInBatch = (double) batchElapsedTime / (double) numberOfTrials; // calculate the average time per trial in this batch
+            double averageSQR = SQR / (double) numberOfTrials;
             /* print data for this size of input */
-            resultsWriter.printf("%12d  %15.2f\n", inputSize, averageTimePerTrialInBatch); // might as well make the columns look nice
+            resultsWriter.printf("%12d  %15.2f\n", inputSize, averageSQR); // might as well make the columns look nice
             resultsWriter.flush();
             System.out.println(" ....done.");
 
@@ -78,19 +93,19 @@ public class TravelingSalesman {
     }
 
     public static void main(String[] args) {
-        runFullExperiment("Greedy-Exp1.txt");
-        runFullExperiment("Greedy-Exp2.txt");
-        runFullExperiment("Greedy-Exp3.txt");
-//        int matrixsize = 7;
+        runFullExperiment("Correctness_Test1.txt");
+        runFullExperiment("Correctness_Test2.txt");
+        runFullExperiment("Correctness_Test3.txt");
+//        int matrixsize = 5;
 //        double[][] Matrix = GenerateGraphs.GenerateRandomCircularGraphCostMatrix(matrixsize);
-////        double[][] Matrix = GenerateGraphs.GenerateRandomCostMatrix(matrixsize);
+//        double[][] Matrix = GenerateGraphs.GenerateRandomEuclideanCostMatrix(matrixsize);
 //        int[] tour = BruteForce(Matrix, matrixsize);
 //        int[] tour2 = GreedyAlgorithm(Matrix, matrixsize);
-//        System.out.println("Brute Force");
+//        System.out.println(CalculateTourLength(Matrix, tour));
 //        PrintArray(tour);
 //        System.out.println("Greedy Algorithm");
 //        PrintArray(tour2);
-//        PrintMatrix(Matrix, matrixsize);
+       // PrintMatrix(Matrix, matrixsize);
     }
 
     // Using Heaps algorithm to produce permutations
@@ -144,10 +159,10 @@ public class TravelingSalesman {
 
         for (int i = 0; i<size; i++){
             if (i != 0) {
-                distance = 100;
+                distance = 100000;
                 nextStep = 0;
             } else {
-                distance = 100;
+                distance = 100000;
                 nextStep = i + 1;
             }
             for (int j = 0; j<size; j++) {
@@ -221,12 +236,13 @@ public class TravelingSalesman {
     }
 
     public static double CalculateTourLength(double matrix[][], int tour[]) {
-
+        //double distance = 0;
         double distance = matrix[tour[tour.length-1]][tour[0]];
         for (int i = 0; i < tour.length-1; i++) {
+            //System.out.println(distance);
             distance += matrix[tour[i]][tour[i + 1]];
         }
-
+        //System.out.println(distance);
         return distance;
     }
 }

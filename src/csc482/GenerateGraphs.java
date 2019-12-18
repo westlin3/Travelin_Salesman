@@ -10,7 +10,7 @@ public class GenerateGraphs {
                 if (i == j)
                     Matrix[i][j] = 0;
                 else {
-                    Matrix[i][j] = (int) (Math.random() * 100) + 1;
+                    Matrix[i][j] = (int) (Math.random() * 105) + 1;
                     Matrix[j][i] = Matrix[i][j];
                 }
             }
@@ -18,11 +18,11 @@ public class GenerateGraphs {
         return Matrix;
     }
     public static double [][] GenerateRandomEuclideanCostMatrix(int size) {
-        int[][] Locations = new int[size][2];
+        double[][] Locations = new double[size][2];
         double[][] Matrix = new double[size][size];
         for (int i = 0; i < size; i++) {
-            Locations[i][0] = (int) Math.random() * 20;
-            Locations[i][1] = (int) Math.random() * 20;
+            Locations[i][0] = (double) Math.random() * 150;
+            Locations[i][1] = (double) Math.random() * 150;
         }
         for (int j = 0; j < size; j++) {
             for (int k = j; k < size; k++) {
@@ -44,8 +44,8 @@ public class GenerateGraphs {
         for (int i = 0; i < size; i++) {
             order[i] = i;
             double num = (double) i;
-            Locations[i][0] = Math.sin((double)num/size*2*Math.PI)*10;
-            Locations[i][1] = Math.cos((double)num/size*2*Math.PI)*10;
+            Locations[i][0] = Math.sin((double)num/size*2*Math.PI)*100;
+            Locations[i][1] = Math.cos((double)num/size*2*Math.PI)*100;
         }
 
         // Randomize order of points
